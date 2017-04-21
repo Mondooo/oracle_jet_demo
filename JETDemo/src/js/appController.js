@@ -7,6 +7,7 @@
  */
 define(['ojs/ojcore', 'knockout', 'ojs/ojrouter', 'ojs/ojknockout', 'ojs/ojarraytabledatasource',
   'ojs/ojoffcanvas'],
+
   function(oj, ko) {
      function ControllerViewModel() {
        var self = this;
@@ -17,12 +18,12 @@ define(['ojs/ojcore', 'knockout', 'ojs/ojrouter', 'ojs/ojknockout', 'ojs/ojarray
       var mdQuery = oj.ResponsiveUtils.getFrameworkQuery(oj.ResponsiveUtils.FRAMEWORK_QUERY_KEY.MD_UP);
       self.mdScreen = oj.ResponsiveKnockoutUtils.createMediaQueryObservable(mdQuery);
 
-       // Router setup
-       self.router = oj.Router.rootInstance;
-       self.router.configure({
-         'dashboard': {label: 'Dashboard', isDefault: true},
-         'incidents': {label: 'Incidents'}
-       });
+      // Router setup
+      self.router = oj.Router.rootInstance;
+      self.router.configure({
+        'dashboard': {label: 'Dashboard', isDefault: true},
+        'incidents': {label: 'Incidents'}
+      });
       oj.Router.defaults['urlAdapter'] = new oj.Router.urlParamAdapter(); // change to the param URL adapter
 
       // Navigation setup
