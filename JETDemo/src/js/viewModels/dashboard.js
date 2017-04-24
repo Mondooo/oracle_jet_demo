@@ -5,153 +5,84 @@
 /*
  * Your dashboard ViewModel code goes here
  */
-define(['ojs/ojcore', 'knockout', 'jquery', 'ojs/ojknockout', 'ojs/ojtree', 'ojs/ojbutton', 'ojs/ojchart', 'ojs/ojtoolbar'],
+define(['ojs/ojcore', 'knockout', 'jquery', 'ojs/ojknockout', 'ojs/ojtree', 'ojs/ojbutton', 'ojs/ojchart', 'ojs/ojtoolbar', 'ojs/ojmodel', 'ojs/ojtable', 'ojs/ojcollectiontabledatasource'],
 function(oj, ko, $) {
 
-  function ChartModel() {
+  function TreeModel() {
     var self = this;
 
-    var areaGroups = ["Group A", "Group B", "Group C", "Group D"];
-    
-    function getValue() {
-      return 10 + Math.round(Math.random() * 50);
-    }
+    self.LeafsDef = oj.Collection.extend({
+      url: "http://localhost:3000/api",
+    });
 
-    function getSeriesItems() {
-      var items = [];
-      for (var i = areaGroups.length - 1; i >= 0; i--) {
-        items.push(getValue());
-      }
-      return items;
-    }
-    /* chart data */
-    var areaSeries = [{name : "Series 1", items : getSeriesItems()},
-                      {name : "Series 2", items : getSeriesItems()},
-                      {name : "Series 3", items : getSeriesItems()},
-                      {name : "Series 4", items : getSeriesItems()}];
-    
-    self.areaSeriesValue = ko.observableArray(areaSeries);
-    self.areaGroupsValue = ko.observableArray(areaGroups);
-    self.stackValue = ko.observable('o');
-    self.orientationValue = ko.observable('vertical'); // chart direction
-    
-    /* toggle buttons*/
-    self.stackOptions = [
-        {id: 'unstacked', label: 'unstacked', value: 'off', icon: 'oj-icon demo-area-vert'},
-        {id: 'stacked', label: 'stacked', value: 'on', icon: 'oj-icon demo-area-stack'}
-    ];
-    self.orientationOptions = [
-        {id: 'vertical', label: 'vertical', value: 'vertical', icon: 'oj-icon demo-area-vert'},
-        {id: 'horizontal', label: 'horizontal', value: 'horizontal', icon: 'oj-icon demo-area-horiz'}
-    ];
-
-    function updateButtonClick() {
-
-      // first, change the raw data
-      for (var s = 0; s < areaSeries.length; s++) {
-          for (var g = 0; g < areaSeries[s].items.length; g++) {
-              if (Math.random() < 0.3)
-                  areaSeries[s].items[g] = getValue();
-          }
-      }
-
-      // second, change the observable value, it will notify the view to update
-      self.areaSeriesValue(areaSeries);
-
+    self.fetchLeafs = function() {
+      var leafs = new self.LeafsDef;
+      leafs.fetch({
+        success: function(collection, response, options) {
+          console.log(response);
+        },
+        error: function(collection, xhr, options) {
+          console.log("error occurs.");
+        }
+      });
       return true;
     }
-
-    $(function() {
-      $("#tree").on("ojoptionchange", function(e, ui) {
-        console.log("abcd test");
-         if (ui.value[0].className.indexOf('leaf') !== -1) { // do if element is leaf
-           updateButtonClick();
-         }
-      });
-    });
   }
 
-  var chartModel = new ChartModel();
+  $(function() {
+    $("#tree").on("ojoptionchange", function(e, ui) {
+       if (ui.value[0].className.indexOf('leaf') !== -1) { // do if element is leaf
+         console.log('click test.');
+       }
+    });
+  });
 
-  return chartModel;
+  return new TreeModel();
+});
 
-}); 
+function getNodeData(node, fn) {
+    if (node === -1) {
+      fn(getInitialLazyJson()) ;       // initial json with no children
+    }
+    else {
+      var uri = node.attr("uri");
+      // ensure uri is end of '/'
+      if (!(uri === "/")) {
+        uri += "/";
+      }
+      console.log(uri);
+      getLazyJson(fn, uri);
+    }
+};
 
-function  getJson(node, fn) {      // get local json
-  var data = [
-               { 
-                 "title": "News",
-                 "attr": {"id": "news"}
-               },
-               { 
-                 "title": "Blogs",
-                 "attr": {"id": "blogs"},
-                 "children": [ { "title": "Today",
-                                 "attr": {"id": "today"}
-                               },
-                               { "title": "Yesterday",
-                                 "attr": {"id": "yesterday"}
-                               },
-                               { "title": "Archive",
-                                 "attr": {"id": "archive"}
-                               }
-                             ]
-               },
-               {
-                 "title": "Links", 
-                 "attr": {"id": "links"},
-                 "children": [ { "title": "Oracle",
-                                 "attr": {"id": "oracle"}
-                               },
-                               { "title": "IBM",
-                                 "attr": {"id": "ibm"}
-                               },
-                               { "title": "Microsoft",
-                                 "attr": {"id": "ms"},
-                                 "children": [ { "title": "USA",
-                                                 "attr": {"id": "msusa"},
-                                                 "children": [ { "title": "North",
-                                                                 "attr": {"id": "msusanorth"}
-                                                               },
-                                                               { "title": "South",
-                                                                 "attr": {"id": "msusasouth"}
-                                                               },
-                                                               { "title": "East",
-                                                                 "attr": {"id": "msusaeast"}
-                                                               },
-                                                               { "title": "West",
-                                                                 "attr": {"id": "msusawest"}
-                                                               }
-                                                             ]
-                                               },
-                                               { "title": "Europe",
-                                                 "attr": {"id": "msuerope"}
-                                               },
-                                               { "title": "Asia",
-                                                 "attr": {"id": "msasia"},
-                                                 "children": [ { "title": "Japan",
-                                                                 "attr": {"id": "asiajap"}
-                                                               },
-                                                               { "title": "China",
-                                                                 "attr": {"id": "asiachina"}
-                                                               },
-                                                               { "title": "India",
-                                                                 "attr": {"id": "asiaindia"}
-                                                               }
-                                                             ]
-                                               }
-                                             ]
-                               }
-                             ]
-               }
-            ];
+function getLazyJson(fn, uri) {
+  var leafs;
+  $.ajax({
+    type: "POST",
+    url: "http://localhost:3000/api",
+    data: {path: uri},
+    success : function(data) {
+      
+      console.log(data);
+      // if you want to return a data userd by a callback, you must directly invoke the callback function
+      fn(data);
+    }
+  });
+  return leafs;
+}
 
-   fn(data) ;  // pass to ojTree using supplied function
+function getInitialLazyJson() {
+  return  [{
+            "attr": {
+              "uri":"/"
+            },
+            "title": "/",
+            "children": []
+           }];
 };
 
 // Convert a jQuery list of html element nodes to string containing node id's.
-function _arrayToStr(arr)
-{
+function _arrayToStr(arr) {
    var s = "" ;
    $.each(arr, function(i, val)
       {

@@ -3,27 +3,11 @@
  The Universal Permissive License (UPL), Version 1.0
  -->
 <div class="oj-hybrid-padding" style="padding: 30px 50px;">
-  <div id="tree" style="width: 180px;height: auto;float: left;"
-				data-bind="ojComponent:
-				{
-				 component: 'ojTree',
-				 selectionMode: 'multiple',
-				 data:{data: getJson}
-				}">
-  </div>
-  <div id='chart-container' style="float: left; border-left: 1px solid #333;">
-    <div id="areaChart" data-bind="ojComponent: {
-            component: 'ojChart', 
-            type: 'area',
-            series: areaSeriesValue,
-            groups: areaGroupsValue, 
-            animationOnDisplay: 'auto',
-            animationOnDataChange: 'auto',
-            orientation: orientationValue,
-            stack: stackValue,
-            hoverBehavior: 'dim'
-         }"
-         style="width:600px;height:250px;">
-    </div>
+  <div id="tree" style="width: 180px;height: auto;"
+                 data-bind="ojComponent:
+                 {
+                   component: 'ojTree',
+                   data: { data: getNodeData }
+                 }">
   </div>
 </div>
