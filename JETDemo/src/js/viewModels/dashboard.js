@@ -16,7 +16,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'ojs/ojknockout', 'ojs/ojtree', 'ojs
           fn(self.getInitialLazyJson()) ;       // initial base tree node
         }
         else {
-          var uri = node.attr('uri');
+          var uri = node.data('uri');
           if (!(uri === '/')) { // ensure uri is end of '/'
             uri += '/';
           }
@@ -26,7 +26,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'ojs/ojknockout', 'ojs/ojtree', 'ojs
 
       self.getInitialLazyJson = function() {
         return  [{
-                  'attr': { 'uri':'/' },
+                  'metadata': { 'uri':'/' },
                   'title': '/',
                   'children': []
                 }];
@@ -38,12 +38,13 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'ojs/ojknockout', 'ojs/ojtree', 'ojs
           url: 'http://localhost:3000/api',
           data: { path: uri },
           success: function(data) {
-            fn(data);
+            var transformedData = transformData(data);
+            fn(transformedData);
           }
         });
       }
-    }
 
+    }
     return new TreeModel();
 });
 
@@ -61,4 +62,27 @@ function _arrayToStr(arr) {
 
    return s ;
 };
+
+function transformData(dataString) {
+  dataArray = JSON.parse(dataString);
+  if (!dataArray.length) {
+    return [{
+      'attr': {
+        'style': 'display: none'
+      }
+    }];
+  } else {
+    var result = [];
+    dataArray.forEach(function(data) {
+      result.push({
+        'metadata': {
+          'uri': data.path
+        },
+        'title': data.name,
+        'children': data.type === 'directory' ? [] : undefined
+      });
+    });
+    return JSON.stringify(result);
+  }
+}
 
